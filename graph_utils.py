@@ -43,12 +43,10 @@ def write_output(filename, nodes, k):
 """# Helper Functions"""
 
 def choose_top_k(g, k, centrality):
-  centralities = []
-  for n in g.nodes():
-    centralities.append((n, centrality(g, n)))
-  return [x[0]
-  for x in
-      sorted(centralities, key=lambda x: x[1], reverse=True)[:k]]
+  centralities = centrality(g)
+  return [x[0] 
+  for x in 
+      sorted(centralities.items(), key=lambda x: x[1], reverse=True)[:k]]
 
 def get_proportions(k,subgraphs,G):
   N = G.number_of_nodes()
@@ -73,30 +71,27 @@ def random_sample_k(G, k, factor, centrality):
   nodes = get_nodes(G, factor * k, centrality)
   return random.sample(nodes, k)
 
-"""# Centrality Metrics
+"""# Custom Centrality Metrics
 
 ## Neighbor Degree / Degree Ratio `deg_ndeg_ratio`
 Computes the ratio between the degree of a node and the average degree of its neighbors.
+Returns a dictionary of all nodes and their ratio values
 """
 
-def deg_ndeg_ratio(g, node):
-  degree = g.degree(node)
-  if degree == 0:
-    return 0
-  neighbors = g.neighbors(node)
-  neighbor_avg = sum([g.degree(n) for n in neighbors]) / degree
-  retval = 0
-  if neighbor_avg > 0:
-    retval = degree / neighbor_avg
-  return retval
-
-"""## Betweenness `betweenness`
-Uses the `networkx` betweenness centrality metric.
-"""
-
-def betweenness(g, node):
-  b = nx.betweenness_centrality(g)
-  return b[node]
+def deg_ndeg_ratio(g):
+  ratios = {}
+  for n in g.nodes():
+    degree = g.degree(n)
+    if degree == 0:
+      ratios[n] = 0
+      continue
+    neighbors = g.neighbors(n)
+    neighbor_avg = sum([g.degree(i) for i in neighbors]) / degree
+    retval = 0
+    if neighbor_avg > 0:
+      result = degree / neighbor_avg
+      ratios[n] = result
+  return ratios
 
 """# Processing
 
