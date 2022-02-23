@@ -108,13 +108,14 @@ Run this function to create an output file given an input graph.
 `factor` _(optional)_: the initial selection will choose `factor * k` nodes, then randomly select `k` nodes from that set (default is 2)
 """
 
-def compute_nodes(filepath, centrality, k=None, factor=2, write=False):
+def compute_nodes(filepath, centrality, k=None, factor=2, write=False, verbose=False):
   filename = filepath.split("/")[-1]
   G = parse_graph(filepath)
   if k is None:
     num_players, k, id = parse_file(filename)
   nodes = random_sample_k(G, k, factor, centrality)
-  print(nodes)
+  if verbose:
+    print(nodes)
   if write:
     write_output(f'{filename.rstrip(".json")}.txt', nodes, k)
   return nodes
